@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.hrishi.capstone'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // Lombok
+    implementation 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+    // Selenium
+    implementation 'org.seleniumhq.selenium:selenium-java:4.20.0'
+
+    // Log4j
+    implementation 'org.apache.logging.log4j:log4j-core:3.0.0-beta2'
+    implementation 'org.apache.logging.log4j:log4j-api:3.0.0-beta2'
+
+    // Javafaker
+    implementation 'com.github.javafaker:javafaker:1.0.2'
+
+    // TestNG
+    testImplementation 'org.testng:testng:7.10.1'
+
+    // Allure
+    testImplementation 'io.qameta.allure:allure-testng:2.27.0'
+
+//    implementation 'io.github.bonigarcia:webdrivermanager:5.3.1'
+
+}
+
+test {
+    useTestNG() {
+        parallel = 'methods'
+        threadCount = Integer.parseInt(System.getProperty('sessions', '2'))
+        includeGroups System.getProperty('tags', 'register')
+    }
+    systemProperty 'allure.results.directory', 'build/allure-results'
+}
+
+task allureReport(type: Exec) {
+    dependsOn test
+    commandLine 'allure', 'generate', 'build/allure-results', '-o', 'build/reports/allure-report'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.release=11
+}
